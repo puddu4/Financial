@@ -1,0 +1,22 @@
+{
+  "income": {
+    "fixed": [2500],
+    "variable": [500]
+  },
+  "expenses": [
+    {"category": "miete", "amount": 900, "recurring": true},
+    {"category": "lebensmittel", "amount": 350, "recurring": true},
+    {"category": "mobilität", "amount": 120, "recurring": true},
+    {"category": "freizeit", "amount": 200, "recurring": false},
+    {"category": "abo-streaming", "amount": 30, "recurring": true}
+  ],
+  "one_time_expenses": [
+    {"category": "urlaub", "amount": 400, "recurring": false}
+  ],
+  "savings_goals": [
+    {"name": "Notgroschen", "target": 3000, "current": 1500},
+    {"name": "Reise", "target": 1200, "current": 200}
+  ],
+  "current_balance": 2000,
+  "period_months": 6
+}
