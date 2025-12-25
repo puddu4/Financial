@@ -14,6 +14,8 @@ Dieses kleine Werkzeug analysiert persönliche Finanzdaten und liefert eine klar
    ```
 3. Die Ausgabe enthält eine Kurzbeschreibung, Top-Ausgabenkategorien und priorisierte Empfehlungen.
 
+Das Script validiert die Eingaben und bricht mit einer klaren Fehlermeldung ab, wenn z. B. negative Beträge oder ein ungültiger Zeitraum angegeben sind.
+
 ## Tests
 Führe alle Tests mit:
 ```bash

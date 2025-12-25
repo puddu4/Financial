@@ -12,6 +12,7 @@ from financial_analysis import (
     build_finance_data,
     format_summary,
     summarize_budget,
+    validate_finance_data,
 )
 
 
@@ -65,6 +66,16 @@ def test_visualization_payload_shapes(sample_payload):
     assert len(progress_entries) == 2
     assert progress_entries[0]["name"] == "Notgroschen"
     assert progress_entries[0]["progress"] == pytest.approx(0.5)
+
+
+def test_validation_rejects_negative_values(sample_payload):
+    sample_payload["income"]["fixed"][0] = -100
+
+    with pytest.raises(ValueError) as err:
+        finance_data = build_finance_data(sample_payload)
+        validate_finance_data(finance_data)
+
+    assert "Einnahmen" in str(err.value)
 
 
 def test_format_summary_contains_key_sections(sample_payload):

@@ -130,6 +130,27 @@ def build_finance_data(payload: Dict) -> FinanceData:
     )
 
 
+def validate_finance_data(finance_data: FinanceData) -> None:
+    problems: List[str] = []
+
+    if finance_data.period_months <= 0:
+        problems.append("'period_months' muss größer als 0 sein.")
+
+    if any(amount < 0 for amount in finance_data.income.fixed + finance_data.income.variable):
+        problems.append("Einnahmen dürfen nicht negativ sein.")
+
+    for exp in finance_data.expenses + finance_data.one_time_expenses:
+        if exp.amount < 0:
+            problems.append(f"Ausgabe '{exp.category}' hat einen negativen Betrag.")
+
+    for goal in finance_data.savings_goals:
+        if goal.target < 0 or goal.current < 0:
+            problems.append(f"Sparziel '{goal.name}' enthält negative Werte.")
+
+    if problems:
+        raise ValueError("; ".join(problems))
+
+
 def summarize_budget(finance_data: FinanceData) -> BudgetSummary:
     fixed_expenses = sum(exp.amount for exp in finance_data.expenses if exp.recurring)
     variable_expenses = sum(exp.amount for exp in finance_data.expenses if not exp.recurring)
@@ -245,6 +266,7 @@ def build_visualization_data(summary: BudgetSummary, insights: Insights, finance
 
 def analyze_finances(payload: Dict) -> AnalysisResult:
     finance_data = build_finance_data(payload)
+    validate_finance_data(finance_data)
     summary = summarize_budget(finance_data)
 
     all_expenses = finance_data.expenses + finance_data.one_time_expenses
@@ -280,9 +302,20 @@ def format_summary(result: AnalysisResult) -> str:
         f"- Sparquote: {result.summary.savings_rate:.1%}",
     ]
 
+    lines.append(
+        f"- Fixe Kosten: {result.summary.fixed_costs:.2f} | Variable Kosten: {result.summary.variable_costs:.2f} | Einmalig: {result.summary.one_time_costs:.2f}"
+    )
+
     lines.append("\nTop-Kategorien:")
     for category, amount in result.insights.largest_categories:
         lines.append(f"- {category}: {amount:.2f}")
+
+    if result.visualization_data.savings_progress:
+        lines.append("\nSparziele:")
+        for goal in result.visualization_data.savings_progress:
+            lines.append(
+                f"- {goal['name']}: {goal['current']:.0f}/{goal['target']:.0f} ({goal['progress']*100:.0f}% erreicht)"
+            )
 
     lines.append("\nEmpfehlungen:")
     for idx, action in enumerate(result.recommendations.actions, start=1):
